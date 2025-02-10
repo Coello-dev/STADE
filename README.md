@@ -1,4 +1,4 @@
-# Pruning LLMs by Weights and Activations
+# Pruning LLMs with STADE
 Official PyTorch implementation of **STADE**, as presented in our paper:
 
 ## Setup

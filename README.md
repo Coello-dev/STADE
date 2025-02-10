@@ -5,14 +5,14 @@ Official PyTorch implementation of **STADE**, as presented in our paper:
 Installation instructions can be found in [INSTALL.md](INSTALL.md).
 
 ## Usage
-Below is an example command for pruning Llama-3.2-1B with Wanda, to achieve unstructured 50% sparsity.
+Below is an example command for pruning Llama-3.2-1B with Wanda to execute unstructured 50% sparsity with STADE.
 ```
 python main.py \
     --meta-llama/Llama-3.2-1B \
     --prune_method stade \
     --sparsity_ratio 0.5 \
     --sparsity_type 2:4 \
-    --save out/llama_3.2_1b/2_4/wanda/ 
+    --save out/llama_3.2_1b/0.5/stade/ 
 ```
 We provide a quick overview of the arguments:  
 - `--model`: The identifier for the LLaMA/OPT model on the Hugging Face model hub.
@@ -30,7 +30,7 @@ python main.py \
     --prune_method stade \
     --sparsity_ratio 0.5 \
     --sparsity_type 2:4 \
-    --save out/llama_3.2_1b/2_4/wanda/ 
+    --save out/llama_3.2_1b/2_4/stade/ 
 ```
 
 ### Zero-Shot Evaluation

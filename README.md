@@ -1,5 +1,6 @@
 # Pruning LLMs with STADE
 Official PyTorch implementation of **STADE**, as presented in our paper:
+[STADE: Standard Deviation as a Pruning Metric](https://arxiv.org/abs/2503.22451)
 
 ## Setup
 Installation instructions can be found in [INSTALL.md](INSTALL.md).

@@ -11,7 +11,7 @@ import transformers
 # torch.backends.cudnn.allow_tf32 = False
 
 ## SparseGPT: https://github.com/IST-DASLab/sparsegpt/tree/f5c25005a61f96a0933ca2f95705a963585aafaa
-class SparseGPT:
+class SparseGPTNoupdate:
 
     def __init__(self, layer, **kwargs):
         self.layer = layer
@@ -58,8 +58,6 @@ class SparseGPT:
         H[dead, dead] = 1
         W[:, dead] = 0
 
-        Losses = torch.zeros(self.rows, device=self.dev)
-
         damp = percdamp * torch.mean(torch.diag(H))
         diag = torch.arange(self.columns, device=self.dev)
         H[diag, diag] += damp
@@ -76,8 +74,6 @@ class SparseGPT:
 
             W1 = W[:, i1:i2].clone()
             Q1 = torch.zeros_like(W1)
-            Err1 = torch.zeros_like(W1)
-            Losses1 = torch.zeros_like(W1)
             Hinv1 = Hinv[i1:i2, i1:i2]
 
             if prune_n == 0: 
@@ -94,7 +90,6 @@ class SparseGPT:
 
             for i in range(count):
                 w = W1[:, i]
-                d = Hinv1[i, i]
 
                 if prune_n != 0 and i % prune_m == 0:
                     tmp = W1[:, i:(i + prune_m)] ** 2 / (torch.diag(Hinv1)[i:(i + prune_m)].reshape((1, -1))) ** 2
@@ -104,16 +99,8 @@ class SparseGPT:
                 q[mask1[:, i]] = 0
 
                 Q1[:, i] = q
-                Losses1[:, i] = (w - q) ** 2 / d ** 2
-
-                err1 = (w - q) / d 
-                W1[:, i:] -= err1.unsqueeze(1).matmul(Hinv1[i, i:].unsqueeze(0))
-                Err1[:, i] = err1
 
             W[:, i1:i2] = Q1
-            Losses += torch.sum(Losses1, 1) / 2
-
-            W[:, i2:] -= Err1.matmul(Hinv[i1:i2, i2:])
 
         torch.cuda.synchronize()
         if isinstance(self.layer, transformers.Conv1D):

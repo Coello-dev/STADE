@@ -37,5 +37,21 @@ python main.py \
 ### Zero-Shot Evaluation
 For evaluating zero-shot tasks, we modify the [EleutherAI LM Harness](https://github.com/EleutherAI/lm-evaluation-harness/tree/master) framework so that it could evaluate pruned LLM models. Make sure to download, extract and install this custom `lm_eval` package from the source code.
 
+## Citation
+
+If you found this work useful, please consider citing:
+
+```
+@misc{mecke2025stadestandarddeviationpruning,
+      title={STADE: Standard Deviation as a Pruning Metric},
+      author={Diego Coello de Portugal Mecke and Haya Alyoussef and Maximilian Stubbemann and Ilia Koloiarov and Tom Hanika and Lars Schmidt-Thieme},
+      year={2025},
+      eprint={2503.22451},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2503.22451},
+}
+```
+
 ## Acknowledgement
 This repository is build upon the [Wanda](https://github.com/locuslab/wanda) repository.

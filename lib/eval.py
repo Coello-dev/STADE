@@ -84,8 +84,8 @@ def eval_ppl_wikitext_train(args, model, trainloader, bs=1, device=None):
         lm_logits = model(inputs).logits
 
         # Shift logits and labels for next token prediction
-        shift_logits = lm_logits[:, :-1, :].contiguous().to(device)
-        shift_labels = inputs[:, 1:].to(device)
+        shift_logits = lm_logits[:, :-1, :].contiguous()
+        shift_labels = inputs[:, 1:]
 
         # Compute loss
         loss_fct = nn.CrossEntropyLoss()
@@ -129,21 +129,22 @@ def eval_ppl_wikitext(args, model, testenc, bs=1, device=None):
             j = min(i+bs, nsamples)
 
             # Prepare inputs and move to device
-            inputs = testenc[:,(i * model.seqlen):(j * model.seqlen)].to(device)
+            inputs = testenc[:,(i * model.seqlen):(j * model.seqlen)]
             inputs = inputs.reshape(j-i, model.seqlen)
 
             # Forward pass through the model
-            output = model(inputs).logits
+            output = forward_pass_gpu_constrained(args=args, model=model, input_ids=inputs, device=device)
             lm_logits = output.logits
 
             # Shift logits and labels for next token prediction
-            shift_logits = lm_logits[:, :-1, :].contiguous().to(device)
-            shift_labels = inputs[:, 1:].to(device)
+            shift_logits = lm_logits[:, :-1, :].contiguous()
+            shift_labels = inputs[:, 1:]
 
             # Compute loss
             loss_fct = nn.CrossEntropyLoss()
+            shift_labels = shift_labels.to(device)
             loss = loss_fct(shift_logits.reshape(-1, shift_logits.size(-1)), shift_labels.reshape(-1))
-            shift_labels = shift_labels
+            shift_labels = shift_labels.cpu()
             loss = loss.cpu()
 
             # Calculate negative log likelihood
@@ -164,7 +165,7 @@ def eval_ppl_wikitext(args, model, testenc, bs=1, device=None):
     return ppl.item()
 
 
-def eval_zero_shot(args, task_list=["boolq","rte","hellaswag","winogrande","arc_challenge","arc_easy","openbookqa"], 
+def eval_zero_shot(args, model_path, task_list=["boolq","rte","hellaswag","winogrande","arc_challenge","arc_easy","openbookqa"], 
         num_fewshot=0, use_accelerate=False, add_special_tokens=False, device=None):
     from lm_eval import tasks, evaluator 
     def pattern_match(patterns, source_list):
@@ -175,12 +176,12 @@ def eval_zero_shot(args, task_list=["boolq","rte","hellaswag","winogrande","arc_
         return list(task_names)
     #task_names = pattern_match(task_list, tasks.ALL_TASKS)
     task_names = task_list
-    model_args = f"pretrained=llm_weights/temp,cache_dir=./llm_weights/temp"
+    model_args = f"pretrained={model_path},cache_dir=./{model_path}"
     limit = None 
     if "70b" in args.model or "65b" in args.model:
         limit = 2000
     if use_accelerate:
-        model_args = f"pretrained=llm_weights/temp,cache_dir=./llm_weights/temp,use_accelerate=True"
+        model_args = f"pretrained={model_path},cache_dir=./{model_path},use_accelerate=True"
     results = evaluator.simple_evaluate(
         model='hf',
         model_args=model_args,
@@ -188,8 +189,14 @@ def eval_zero_shot(args, task_list=["boolq","rte","hellaswag","winogrande","arc_
         num_fewshot=num_fewshot,
         batch_size=None,
         device=device,
+        #no_cache=True,
         limit=limit,
+        #description_dict={},
+        #decontamination_ngrams_path=None,
         check_integrity=False,
+        #pretrained_model=model,
+        #tokenizer=tokenizer, 
+        #add_special_tokens=add_special_tokens
     )
 
     return results 

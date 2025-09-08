@@ -19,7 +19,7 @@ We provide a quick overview of the arguments:
 - `--model`: The identifier for the LLaMA/OPT model on the Hugging Face model hub.
 - `--cache_dir`: Directory for loading or storing LLM weights. The default is `llm_weights`.
 - `--cuda_device`: Specifies the cuda device number.
-- `--prune_method`: We have implemented the pruning methods [`random`, `magnitude`, `wanda`, `sparsegpt`, `std`, `stdnobias`, `stade`, `stadenobias`].
+- `--prune_method`: We have implemented the following pruning methods [`random`, `magnitude`, `wanda`, `sparsegpt`, `stade`, `stadew`, `stade_plus`].
 - `--sparsity_ratio`: Denotes the percentage of weights to be pruned.
 - `--sparsity_type`: Specifies the type of sparsity [`unstructured`, `2:4`, `4:8`].
 - `--save`: Specifies the directory where the result will be stored.

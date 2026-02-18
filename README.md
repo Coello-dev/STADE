@@ -39,7 +39,7 @@ For evaluating zero-shot tasks, we modify the [EleutherAI LM Harness](https://gi
 
 ## Citation
 
-If you found this work useful, please consider citing:
+// If you found this work useful, please consider citing:
 
 ```
 @misc{mecke2025stadestandarddeviationpruning,
